@@ -14,6 +14,7 @@ Command : python3 prepare_librispeech_official_lm.py --dst [...] --kenlm [...]/k
 
 Replace [...] with appropriate paths
 """
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -38,14 +39,14 @@ if __name__ == "__main__":
         d=args.kenlm
     )
     print("Downloading Librispeech official LM model...\n", flush=True)
-    arpa_file = os.path.join(decoder_path, lm + ".arpa")
+    arpa_file = os.path.join(decoder_path, f"{lm}.arpa")
     if not os.path.exists(arpa_file):
         os.system(
             "wget -c -O - http://www.openslr.org/resources/11/{lm}.arpa.gz | "
             "gunzip -c > {fout}".format(lm=lm, fout=arpa_file)
         )
     else:
-        print("Arpa file {} exist, skip its downloading.".format(arpa_file))
+        print(f"Arpa file {arpa_file} exist, skip its downloading.")
     # temporary arpa file in lowercase
     print("Saving ARPA LM file in binary format ...\n", flush=True)
     os.system(
@@ -57,12 +58,12 @@ if __name__ == "__main__":
             bin=binary, farpa=arpa_file, fbin=arpa_file.replace(".arpa", ".bin")
         )
     )
-    os.remove(os.path.join(arpa_file + ".tmp"))
+    os.remove(os.path.join(f"{arpa_file}.tmp"))
 
     # prepare lexicon word -> tokens spelling
     # write words to lexicon.txt file
     lex_file = os.path.join(decoder_path, "lexicon.txt")
-    print("Writing Lexicon file - {}...".format(lex_file))
+    print(f"Writing Lexicon file - {lex_file}...")
     with open(lex_file, "w") as f:
         # get all the words in the arpa file
         with open(arpa_file, "r") as arpa:
@@ -72,7 +73,7 @@ if __name__ == "__main__":
                     continue
                 word = line.split("\t")[1]
                 word = word.strip().lower()
-                if word == "<unk>" or word == "<s>" or word == "</s>":
+                if word in ["<unk>", "<s>", "</s>"]:
                     continue
                 assert re.match("^[a-z']+$", word), "invalid word - {w}".format(w=word)
                 f.write("{w}\t{s} |\n".format(w=word, s=" ".join(word)))

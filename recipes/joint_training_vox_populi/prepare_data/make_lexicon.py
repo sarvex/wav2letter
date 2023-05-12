@@ -12,10 +12,7 @@ log = logging.getLogger(__name__)
 
 
 def has_valid_tokens(word: str, tokens: Set[str]) -> bool:
-    for c in word:
-        if c not in tokens:
-            return False
-    return True
+    return all(c in tokens for c in word)
 
 
 def read_token_file(path_token_file: Path, eow_char: str) -> Set[str]:
@@ -30,9 +27,7 @@ def save_lexicon(
     lexicon: Set[str], path_out: Path, eow_char: str, tokens: Set[str]
 ) -> None:
 
-    list_lexicon = list(lexicon)
-    list_lexicon.sort()
-
+    list_lexicon = sorted(lexicon)
     with path_out.open("w") as file:
         for word in list_lexicon:
             if has_valid_tokens(word, tokens):
@@ -44,12 +39,7 @@ def load_lexicon(path_lexicon: Path) -> Dict[str, str]:
     with open(path_lexicon, "r") as file:
         data = [x.strip() for x in file.readlines()]
 
-    out = {}
-    for line in data:
-        word = line[0]
-        spelling = " ".join(line[1:])
-        out[word] = spelling
-    return out
+    return {line[0]: " ".join(line[1:]) for line in data}
 
 
 def load_words_from_lst(path_lst: Path, n_best: int, min_occ: int, is_raw_text: bool):
@@ -72,10 +62,7 @@ def load_words_from_lst(path_lst: Path, n_best: int, min_occ: int, is_raw_text: 
     out = {}
     # id_ path duration normalized_text
     for line in data:
-        if is_raw_text:
-            words = line.split()
-        else:
-            words = line.split()[3:]
+        words = line.split() if is_raw_text else line.split()[3:]
         for word in words:
             if word not in out:
                 out[word] = 0

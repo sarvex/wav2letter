@@ -14,6 +14,7 @@ Command : python3 prepare_unpaired.py --data_dst [...] --model_dst [...]
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -44,17 +45,13 @@ if __name__ == "__main__":
     reflen_dict = set()
     for name in subpaths["unpaired"]:
         unpaired_data = {}
-        with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
+        with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
             for line in flist:
                 file_tag, audio_path, audio_length, _ = line.strip().split(" ", 3)
                 unpaired_data[file_tag] = (audio_path, audio_length)
 
-        with open(
-            os.path.join(unpaired_lists_path, name + "-viterbi.out"), "r"
-        ) as fdata:
-            with open(
-                os.path.join(unpaired_lists_path, name + "-lpm.lst"), "w"
-            ) as fout:
+        with open(os.path.join(unpaired_lists_path, f"{name}-viterbi.out"), "r") as fdata:
+            with open(os.path.join(unpaired_lists_path, f"{name}-lpm.lst"), "w") as fout:
                 for line in fdata:
                     file_tag, reflen = line.strip().split(" ", 1)
                     fout.write(

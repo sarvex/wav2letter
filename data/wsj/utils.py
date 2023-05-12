@@ -42,7 +42,7 @@ def preprocess_word(word):
 
 
 def find_transcripts(dst_paths):
-    transcripts = dict()
+    transcripts = {}
     for ds_path in dst_paths:
         for dirpath, _, filenames in os.walk(ds_path):
             for filename in filenames:
@@ -52,7 +52,7 @@ def find_transcripts(dst_paths):
                 subset = full_path.split(os.sep)[-3]
                 assert subset, "Subset is empty"
 
-                transcripts.setdefault(subset, dict())
+                transcripts.setdefault(subset, {})
                 with open(full_path, "r") as f:
                     for line in f:
                         transcript, file_id = line.strip().rsplit(" ", 1)
@@ -86,17 +86,15 @@ def ndx_to_samples(prefix, filename, transcripts, transform=None, sep="-"):
             suf = suf.lstrip(" /")
             ds, subset, _, sample_id = suf.replace(".wv1", "").rsplit("/", 3)
 
-            fname = os.path.join(prefix, "{}{}{}.{}".format(p1, sep, p2, p3), suf)
+            fname = os.path.join(prefix, f"{p1}{sep}{p2}.{p3}", suf)
 
-            assert os.path.exists(fname), "Audio file {} doesn't exist".format(fname)
+            assert os.path.exists(fname), f"Audio file {fname} doesn't exist"
             assert (
                 subset in transcripts
-            ), "Subset {} is absent in the transcription".format(subset)
+            ), f"Subset {subset} is absent in the transcription"
             assert (
                 sample_id in transcripts[subset]
-            ), "Id {} is absent in the subset {} of transcription for file {}".format(
-                sample_id, subset, fname
-            )
+            ), f"Id {sample_id} is absent in the subset {subset} of transcription for file {fname}"
 
             samples_list.append(
                 {
@@ -104,7 +102,7 @@ def ndx_to_samples(prefix, filename, transcripts, transform=None, sep="-"):
                     "filename": fname,
                     "subset": subset,
                     "transcript": transcripts[subset][sample_id],
-                    "basename": os.path.join("{}{}{}.{}".format(p1, sep, p2, p3), suf),
+                    "basename": os.path.join(f"{p1}{sep}{p2}.{p3}", suf),
                 }
             )
     samples_list.sort(key=lambda x: x["id"])
@@ -117,23 +115,23 @@ def convert_to_flac(sample_data):
     out_prefix = os.path.join(dst, "%09d" % idx)
 
     # flac
-    if not os.path.exists(out_prefix + ".flac"):
+    if not os.path.exists(f"{out_prefix}.flac"):
         tmp_file = os.path.join(dst, "{pid}_tmp.wav".format(pid=os.getpid()))
         os.system("{sph} -f wav {i} {o}".format(sph=sph2pipe, i=filename, o=tmp_file))
         assert (
             sox.file_info.duration(tmp_file) > 0
-        ), "Audio file {} duration is zero.".format(filename)
+        ), f"Audio file {filename} duration is zero."
 
         sox_tfm = sox.Transformer()
         sox_tfm.set_output_format(file_type="flac", encoding="signed-integer", bits=16)
-        sox_tfm.build(tmp_file, out_prefix + ".flac")
+        sox_tfm.build(tmp_file, f"{out_prefix}.flac")
 
         os.remove(tmp_file)
 
-    duration = sox.file_info.duration(out_prefix + ".flac") * 1000  # miliseconds
+    duration = sox.file_info.duration(f"{out_prefix}.flac") * 1000
     transcript = " ".join(
         [preprocess_word(word) for word in sample["transcript"].split()]
     )
     transcript = re.sub(" +", " ", transcript).strip()
 
-    return [sample["basename"], out_prefix + ".flac", str(duration), transcript]
+    return [sample["basename"], f"{out_prefix}.flac", str(duration), transcript]

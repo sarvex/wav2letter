@@ -20,7 +20,7 @@ UNKIDX = 3
 
 
 def compute_new_state(model_state):
-    new_state = dict()
+    new_state = {}
     for key, val in model_state["model"].items():
         if "1.weight" in key and "adaptive" in key:
             new_state[
@@ -124,23 +124,21 @@ def load_word_model(pytorch_model_path, fairseq_dict, dataset_type):
 
 
 def decodeInputText(sentences, token_indices_dict):
-    sentences_decoded = []
-    for line in sentences:
-        sentences_decoded.append(
-            [
-                token_indices_dict[UNK]
-                if token not in token_indices_dict
-                else token_indices_dict[token]
-                for token in line.split(" ")
-            ]
-        )
-    return sentences_decoded
+    return [
+        [
+            token_indices_dict[UNK]
+            if token not in token_indices_dict
+            else token_indices_dict[token]
+            for token in line.split(" ")
+        ]
+        for line in sentences
+    ]
 
 
 def build_token_index_correspondence(dict_fname):
     # follow fairseq
-    token_indices_dict = dict()
-    indices_token_dict = dict()
+    token_indices_dict = {}
+    indices_token_dict = {}
     with open(dict_fname, "r") as f:
         for index, line in enumerate(f):
             token_indices_dict[line.strip().split(" ")[0]] = index + 4

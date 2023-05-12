@@ -14,6 +14,7 @@ Command : python3 prepare.py --data_dst [...] --model_dst [...]
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -39,9 +40,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     os.system(
-        "python3 {}/../../../data/librispeech/prepare.py --dst {} -p {}".format(
-            os.path.dirname(os.path.abspath(__file__)), args.data_dst, args.process
-        )
+        f"python3 {os.path.dirname(os.path.abspath(__file__))}/../../../data/librispeech/prepare.py --dst {args.data_dst} -p {args.process}"
     )
 
     subpaths = {
@@ -60,10 +59,10 @@ if __name__ == "__main__":
     num_wordpieces = 10000
     nbest = 10
     train_all_text = os.path.join(am_path, "train.txt")
-    prefix = "librispeech-train-all-unigram-{}".format(num_wordpieces)
+    prefix = f"librispeech-train-all-unigram-{num_wordpieces}"
     prefix = os.path.join(am_path, prefix)
-    vocab_name = prefix + ".vocab"
-    model_name = prefix + ".model"
+    vocab_name = f"{prefix}.vocab"
+    model_name = f"{prefix}.model"
 
     # prepare data
     print("Preparing tokens and lexicon for acoustic model...\n", flush=True)
@@ -71,7 +70,7 @@ if __name__ == "__main__":
     with open(train_all_text, "w") as ftext:
         for key, names in subpaths.items():
             for name in names:
-                with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
+                with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
                     for line in flist:
                         transcription = line.strip().split(" ")[3:]
                         if key == "train":

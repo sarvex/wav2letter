@@ -14,6 +14,7 @@ Command : python3 prepare.py --dst [...]
 Replace [...] with appropriate path
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -58,27 +59,26 @@ if __name__ == "__main__":
     # Download the audio data
     print("Downloading the AMI audio data...", flush=True)
     cmds = []
-    for split in splits.keys():
+    for split, value in splits.items():
         with open(os.path.join("splits", f"split_{split}.orig")) as f:
             for line in f:
                 line = line.strip()
-                splits[split].append(line)
+                value.append(line)
                 cur_audio_path = os.path.join(audio_path, line)
                 os.makedirs(cur_audio_path, exist_ok=True)
                 num_meetings = 5 if line in ["EN2001a", "EN2001d", "EN2001e"] else 4
-                for meetid in range(num_meetings):
-                    cmds.append(
-                        f"wget -nv --continue -o /dev/null -P {cur_audio_path} {audio_http}/AMICorpusMirror/amicorpus/{line}/audio/{line}.Headset-{meetid}.wav"
-                    )
-
+                cmds.extend(
+                    f"wget -nv --continue -o /dev/null -P {cur_audio_path} {audio_http}/AMICorpusMirror/amicorpus/{line}/audio/{line}.Headset-{meetid}.wav"
+                    for meetid in range(num_meetings)
+                )
     for i in tqdm(range(len(cmds))):
         os.system(cmds[i])
 
     print("Downloading the text data ...", flush=True)
     annotver = "ami_public_manual_1.6.1.zip"
     cmd = f"wget -nv --continue -o /dev/null -P {text_path} {audio_http}/AMICorpusAnnotations/{annotver};"
-    cmd = cmd + f"mkdir -p {text_path}/annotations;"
-    cmd = cmd + f"unzip -q -o -d {text_path}/annotations {text_path}/{annotver} ;"
+    cmd = f"{cmd}mkdir -p {text_path}/annotations;"
+    cmd = f"{cmd}unzip -q -o -d {text_path}/annotations {text_path}/{annotver} ;"
     os.system(cmd)
 
     print("Parsing the transcripts ...", flush=True)
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     print("Segmenting audio files...", flush=True)
     with open(f"{text_path}/annotations/transcripts2") as f:
         lines = f.readlines()
-    lines = [audio_path + " " + line for line in lines]
+    lines = [f"{audio_path} {line}" for line in lines]
     os.makedirs(os.path.join(audio_path, "segments"), exist_ok=True)
     with Pool(args.process) as p:
         samples = list(
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             )
         )
     samples = [s for s in samples if s is not None]  # filter None values
-    print("Wrote {} audio segment samples".format(len(samples)))
+    print(f"Wrote {len(samples)} audio segment samples")
 
     print("Writing to list files...", flush=True)
     for split, meetings in splits.items():

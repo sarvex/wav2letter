@@ -16,25 +16,19 @@ def run_for_id(file_name):
     print("Starting thread")
     contractions = []
     with open(CONTRACTIONS, "r") as c:
-        for line in c:
-            contractions.append(line.strip())
-
+        contractions.extend(line.strip() for line in c)
     print("Parsing input file")
 
     lines = []
     with open(file_name, "r") as f:
-        for line in f:
-            lines.append(line)
-
+        lines.extend(iter(f))
     print("Done parsing input file")
 
     # with open(file_name + ".filtered", "w") as f:
     filtered_lines = []
-    counter = 0
-    for line in lines:
-        counter += 1
+    for counter, line in enumerate(lines, start=1):
         if counter % 10000 == 0:
-            print("Counter at " + str(counter))
+            print(f"Counter at {str(counter)}")
         filtered_words = []
         for word in line.strip().split(" "):
             word = word.strip()
@@ -48,18 +42,16 @@ def run_for_id(file_name):
             else:
                 # Check if between two letters
                 idx = word.find("'")
-                if idx != -1:
-                    # Check if apostrophe occurs between two letters (consider valid if so)
-                    if idx + 1 < len(word) and idx != 0:
-                        filtered_words.append(word)
-                    else:
-                        filtered_words.append(word.strip().replace("'", ""))
-                else:
+                if idx == -1:
                     filtered_words.append(word)
+                elif idx + 1 < len(word) and idx != 0:
+                    filtered_words.append(word)
+                else:
+                    filtered_words.append(word.strip().replace("'", ""))
         filtered_lines.append(" ".join(filtered_words))
 
     print("Writing output file")
-    with open(file_name + ".filtered", "w") as f:
+    with open(f"{file_name}.filtered", "w") as f:
         for line in filtered_lines:
             f.write(line)
             f.write("\n")

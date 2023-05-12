@@ -15,6 +15,7 @@ Command : python3 prepare.py --dst [...]
 Replace [...] with appropriate path
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -53,10 +54,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     files = find_files(args.src)
 
-    assert len(files) == 11699, (
-        "Expected to find 11699 .sph and transcript files in the Fisher "
-        "data, found {}".format(len(files))
-    )
+    assert (
+        len(files) == 11699
+    ), f"Expected to find 11699 .sph and transcript files in the Fisher data, found {len(files)}"
 
     audio_path = os.path.join(args.dst, "audio")
     text_path = os.path.join(args.dst, "text")

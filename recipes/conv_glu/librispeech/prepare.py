@@ -15,6 +15,7 @@ Command : python3 prepare.py --data_dst [...] --model_dst [...] --kenlm [...]/ke
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -39,9 +40,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     os.system(
-        "python3 {}/../../../data/librispeech/prepare.py --dst {} -p {}".format(
-            os.path.dirname(os.path.abspath(__file__)), args.data_dst, args.process
-        )
+        f"python3 {os.path.dirname(os.path.abspath(__file__))}/../../../data/librispeech/prepare.py --dst {args.data_dst} -p {args.process}"
     )
 
     subpaths = {
@@ -71,7 +70,7 @@ if __name__ == "__main__":
     word_dict = defaultdict(set)
     for key, names in subpaths.items():
         for name in names:
-            with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
+            with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
                 for line in flist:
                     transcription = line.strip().split(" ")[3:]
                     word_dict[key].update(transcription)

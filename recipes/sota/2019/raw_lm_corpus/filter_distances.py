@@ -10,9 +10,7 @@ def eprint(*args, **kwargs):
 def run(filename, score, distance_ratio):
     eprint("Starting with filename ", filename)
     with open(filename, "r") as f:
-        done = 0
-        for line in f:
-            done += 1
+        for done, line in enumerate(f, start=1):
             str1, str2, scoreRaw = line.split("|")
             distance = float(scoreRaw)
             len1 = len(str1.split())

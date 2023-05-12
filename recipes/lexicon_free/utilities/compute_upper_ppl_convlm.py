@@ -95,15 +95,12 @@ def compute_ppl_upper_limit_char_convlm(
     ppl_word = numpy.exp(-sum_logp / n_words)
 
     print(
-        "Letter loss: {}, letter perplexity: {}".format(
-            loss_letter, numpy.exp(loss_letter)
-        )
+        f"Letter loss: {loss_letter}, letter perplexity: {numpy.exp(loss_letter)}"
     )
-    print("Upper word perplexity for all words: {}".format(ppl_word))
-    print("Upper word perplexity for unknown words: {}".format(ppl_word_unk))
+    print(f"Upper word perplexity for all words: {ppl_word}")
+    print(f"Upper word perplexity for unknown words: {ppl_word_unk}")
     print(
-        "(Reported in the paper) "
-        "Upper word perplexity for known words: {}".format(ppl_word_no_unk)
+        f"(Reported in the paper) Upper word perplexity for known words: {ppl_word_no_unk}"
     )
 
 
@@ -139,11 +136,10 @@ def compute_ppl_upper_limit_word_convlm(model, input_wordlm):
         -(sum_logp_known + sum_logp_unknown) / (n_known_words + n_unknown_words)
     )
 
-    print("Word perplexity for all words: {}".format(ppl_word))
-    print("Word perplexity for unknown words: {}".format(ppl_word_unk))
+    print(f"Word perplexity for all words: {ppl_word}")
+    print(f"Word perplexity for unknown words: {ppl_word_unk}")
     print(
-        "(Reported in the paper) "
-        "Word perplexity for known words: {}".format(ppl_word_no_unk)
+        f"(Reported in the paper) Word perplexity for known words: {ppl_word_no_unk}"
     )
 
 
@@ -166,7 +162,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    print("Evaluate file {}".format(args.text))
+    print(f"Evaluate file {args.text}")
 
     token_indices_dict, indices_token_dict = build_token_index_correspondence(args.dict)
 
@@ -181,9 +177,7 @@ if __name__ == "__main__":
         compute_ppl_upper_limit_word_convlm(model, input_data)
     else:
         with open(args.word_dict, "r") as f:
-            known_words = set(
-                [transform_asg(line.strip().split(" ")[0]) + "|" for line in f]
-            )
+            known_words = {transform_asg(line.strip().split(" ")[0]) + "|" for line in f}
         if "14B" in args.model_type:
             model = load_char_model_14B(args.model, fairseq_dict, args.dataset_type)
         else:

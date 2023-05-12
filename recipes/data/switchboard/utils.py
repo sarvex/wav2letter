@@ -16,13 +16,13 @@ def process_hub5_data(sample_data):
     transcript = transcript.replace("<B_ASIDE>", "")
     transcript = transcript.replace("<A_ASIDE>", "")
 
-    spk = "{}-{}".format(parts[0], parts[1])
+    spk = f"{parts[0]}-{parts[1]}"
     start = float(parts[3])
     end = float(parts[4])
     utt = "{u}_{s}-{e}".format(
         u=spk, s="{:06d}".format(int(start * 100)), e="{:06d}".format(int(end * 100))
     )
-    in_file = os.path.join(hub5_sdir, "english", parts[0] + ".sph")
+    in_file = os.path.join(hub5_sdir, "english", f"{parts[0]}.sph")
     out_file = os.path.join(hub5_audio_path, "{:09d}.flac".format(idx))
     tmp_file = os.path.join(hub5_audio_path, "{pid}_tmp.wav".format(pid=os.getpid()))
     os.system(
@@ -32,7 +32,7 @@ def process_hub5_data(sample_data):
     )
     assert (
         sox.file_info.duration(tmp_file) > 0
-    ), "Audio file {} duration is zero.".format(in_file)
+    ), f"Audio file {in_file} duration is zero."
     sox_tfm = sox.Transformer()
     sox_tfm.set_output_format(file_type="flac", encoding="signed-integer", bits=16)
     sox_tfm.trim(start, end)
@@ -54,7 +54,7 @@ def normalize_acronyms(line, acronym_dict):
     del dict_acronym_noi["i"]
     del dict_acronym_noi["I"]
 
-    line = "<dummy-id> " + line.strip()
+    line = f"<dummy-id> {line.strip()}"
     items = line.split()
     L = len(items)
     # First pass mapping to map I as part of acronym
@@ -74,7 +74,7 @@ def normalize_acronyms(line, acronym_dict):
 
     # Second pass mapping (not mapping 'i' and 'I')
     for i in range(len(items)):
-        if items[i] in dict_acronym_noi.keys():
+        if items[i] in dict_acronym_noi:
             items[i] = dict_acronym_noi[items[i]]
     return " ".join(items[1:])
 
@@ -115,7 +115,7 @@ def sanitize(transcript, acronym_dict):
         # remove '_1'
         word = re.sub(r"_\d$", r"", word)
         word = re.sub(r"them_1's", r"them's", word)  # handle case 'them_1's'
-        cleaned_words += word + " "
+        cleaned_words += f"{word} "
     # Normalize acronyms to Fisher format BBC -> b._b._c.
     return normalize_acronyms(cleaned_words, acronym_dict)
 
@@ -136,10 +136,10 @@ def process_swbd_data(sample_data):
         )
         assert (
             sox.file_info.duration(tmp_file) > 0
-        ), "Audio file {} duration is zero.".format(sphfile)
+        ), f"Audio file {sphfile} duration is zero."
         with open(chA if channel == "A" else chB, "r") as f:
             for line in f:
-                name = line[0:6].replace("sw", "sw0")
+                name = line[:6].replace("sw", "sw0")
                 channel = line[6]
                 splits = line.strip().split(" ", 3)
                 start = float(splits[1])

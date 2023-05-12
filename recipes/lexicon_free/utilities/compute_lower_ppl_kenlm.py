@@ -58,7 +58,8 @@ def compute_words_model_pdf_mass(word_model, known_words, stateIn):
     indices = numpy.argsort(-probs_arr)
     top = numpy.where(numpy.cumsum(probs_arr[indices]) > 0.95)[0][0]
     return [
-        transform_asg(w) + "|" if w != EOS else w for w in known_words[indices[:top]]
+        f"{transform_asg(w)}|" if w != EOS else w
+        for w in known_words[indices[:top]]
     ]
 
 
@@ -162,7 +163,7 @@ if __name__ == "__main__":
     parser.add_argument("--word_model", help="kenlm word model")
 
     args = parser.parse_args()
-    print("Evaluate file {}".format(args.text))
+    print(f"Evaluate file {args.text}")
 
     known_words, known_words_original = prepare_vocabs(args.vocab_file)
     with open(args.text, "r") as f:

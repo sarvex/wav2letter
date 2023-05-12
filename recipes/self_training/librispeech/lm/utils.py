@@ -16,9 +16,11 @@ import sox
 def findtranscriptfiles(dir):
     files = []
     for dirpath, _, filenames in os.walk(dir):
-        for filename in filenames:
-            if filename.endswith(".trans.txt"):
-                files.append(os.path.join(dirpath, filename))
+        files.extend(
+            os.path.join(dirpath, filename)
+            for filename in filenames
+            if filename.endswith(".trans.txt")
+        )
     return files
 
 
@@ -39,7 +41,7 @@ def transcript_to_list(file):
     with open(file, "r") as f:
         for line in f:
             file_id, trans = line.strip().split(" ", 1)
-            audio_file = os.path.abspath(os.path.join(audio_path, file_id + ".flac"))
+            audio_file = os.path.abspath(os.path.join(audio_path, f"{file_id}.flac"))
             duration = sox.file_info.duration(audio_file) * 1000  # miliseconds
             ret.append([file_id, audio_file, str(duration), trans.lower()])
 
@@ -49,7 +51,7 @@ def transcript_to_list(file):
 def read_list(src, files):
     ret = []
     for file in files:
-        with open(os.path.join(src, file + ".lst"), "r") as f:
+        with open(os.path.join(src, f"{file}.lst"), "r") as f:
             for line in f:
                 _, _, _, trans = line.strip().split(" ", 3)
                 ret.append(trans)

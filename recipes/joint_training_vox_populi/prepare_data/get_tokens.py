@@ -13,7 +13,7 @@ def get_tokens_from_str(str_in) -> Set[str]:
     for c, val in REPLACE_SET.items():
         str_in = str_in.replace(c, val)
     str_in = str_in.replace(" ", "")
-    return {x for x in str_in.lower().replace(" ", "")}
+    return set(str_in.lower().replace(" ", ""))
 
 
 def get_tokens_from_str_list(list_str: List[str]) -> Set[str]:
@@ -38,10 +38,10 @@ def main(args):
     data = get_base_data_from_csv(args.input_csv)
     all_tokens = get_tokens_from_str_list([x["text"] for x in data])
 
-    remove_tokens = PUNCTUATION + "…»"
+    remove_tokens = f"{PUNCTUATION}…»"
     remove_tokens += "1234567890–"
 
-    all_tokens = all_tokens.difference({x for x in remove_tokens})
+    all_tokens = all_tokens.difference(set(remove_tokens))
 
     save_tokens(all_tokens, args.output)
 

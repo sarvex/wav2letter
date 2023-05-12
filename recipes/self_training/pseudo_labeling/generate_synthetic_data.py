@@ -37,17 +37,13 @@ def filter_transcripts(transcript_list, args):
     for transcript in transcript_list:
         good = True
         # skip transcripts with warnings
-        if args.warnings:
-            if transcript.warning:
-                good = False
-                if args.print_filtered_results:
-                    eprint(
-                        "Filtering predicted transcript (warning) "
-                        + transcript.sid
-                        + ": "
-                        + transcript.prediction
-                    )
-                continue
+        if args.warnings and transcript.warning:
+            good = False
+            if args.print_filtered_results:
+                eprint(
+                    f"Filtering predicted transcript (warning) {transcript.sid}: {transcript.prediction}"
+                )
+            continue
 
         if args.ngram:
             plist = transcript.prediction.split(" ")
@@ -210,9 +206,9 @@ def run():
     args = parser.parse_args()
 
     if not os.path.isfile(args.input):
-        raise Exception("'" + args.input + "' - input file doesn't exist")
+        raise Exception(f"'{args.input}' - input file doesn't exist")
     if not os.path.isfile(args.listpath):
-        raise Exception("'" + args.input + "' - listpath file doesn't exist")
+        raise Exception(f"'{args.input}' - listpath file doesn't exist")
 
     transcripts_predictions = create_transcript_set(
         args.input, args.viterbi, args.distributed_decoding

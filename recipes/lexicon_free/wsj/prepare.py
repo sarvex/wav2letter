@@ -43,13 +43,8 @@ from utils import convert_words_to_letters_asg_rep2
 
 def compare(x, y):
     # sort by counts, if counts equal then sort in lex order
-    if x[1] > y[1]:
+    if x[1] <= y[1] and x[1] == y[1] and x[0] < y[0] or x[1] > y[1]:
         return -1
-    elif x[1] == y[1]:
-        if x[0] < y[0]:
-            return -1
-        else:
-            return 1
     else:
         return 1
 
@@ -81,7 +76,7 @@ def remap_words_with_same_spelling(data_dst, decoder_dst):
     )
 
     special_mapping = {"al": "al-", "st": "st", "nd": "nd", "rd": "rd"}
-    remap_result = dict()
+    remap_result = {}
     with open(os.path.join(decoder_dst, "dict-remap.txt"), "w") as fmap:
         for spelling, _ in sorted_spellings:
             words_count = {w: words_dict[w] for w in spellings_dict[spelling]}
@@ -94,7 +89,7 @@ def remap_words_with_same_spelling(data_dst, decoder_dst):
                     if spelling not in special_mapping
                     else special_mapping[spelling]
                 )
-                fmap.write("{} {}\n".format(word, remap_result[word]))
+                fmap.write(f"{word} {remap_result[word]}\n")
     return remap_result
 
 
@@ -133,16 +128,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     os.system(
-        "python3 {}/../../../data/wsj/prepare.py "
-        "--wsj0 {} --wsj1 {} --sph2pipe {} --wsj1_type {} --dst {} -p {}".format(
-            os.path.dirname(os.path.abspath(__file__)),
-            args.wsj0,
-            args.wsj1,
-            args.sph2pipe,
-            args.wsj1_type,
-            args.data_dst,
-            args.process,
-        )
+        f"python3 {os.path.dirname(os.path.abspath(__file__))}/../../../data/wsj/prepare.py --wsj0 {args.wsj0} --wsj1 {args.wsj1} --sph2pipe {args.sph2pipe} --wsj1_type {args.wsj1_type} --dst {args.data_dst} -p {args.process}"
     )
     lists_path = os.path.join(args.data_dst, "lists")
     am_path = os.path.join(args.model_dst, "am")
@@ -194,9 +180,7 @@ if __name__ == "__main__":
                 words_set.update(transcription)
 
     print(
-        "Writing lexicon file - {}...".format(
-            os.path.join(am_path, "lexicon_si284+nov93dev.txt")
-        ),
+        f'Writing lexicon file - {os.path.join(am_path, "lexicon_si284+nov93dev.txt")}...',
         flush=True,
     )
     with open(os.path.join(am_path, "lexicon_si284+nov93dev.txt"), "w") as f:
@@ -204,7 +188,7 @@ if __name__ == "__main__":
             spelling = get_spelling(word)
             assert re.match(
                 r"[a-z'.]+", spelling
-            ), "invalid spelling for word '{}'".format(word)
+            ), f"invalid spelling for word '{word}'"
 
             f.write(
                 "{word}\t{tokens} |\n".format(
@@ -218,7 +202,7 @@ if __name__ == "__main__":
     print("Generating lexicon.txt (word -> tokens) for decoding", flush=True)
 
     lex_file = os.path.join(decoder_path, "lexicon.lst")
-    print("Writing lexicon file - {}...".format(lex_file), flush=True)
+    print(f"Writing lexicon file - {lex_file}...", flush=True)
     with open(lex_file, "w") as f:
         for word in numpy.unique(list(remap_dict.values())):
             if len(re.findall(r"\d", word)) > 0:
@@ -228,14 +212,12 @@ if __name__ == "__main__":
                 if re.match("^[a-z'.]+$", spelling):
                     f.write("{w}\t{s} |\n".format(w=word, s=" ".join(spelling)))
                 else:
-                    print('Ignore word "{}" in lexicon'.format(word))
+                    print(f'Ignore word "{word}" in lexicon')
 
     # Prepare data for char lm training/evaluation
     if os.path.exists(os.path.join(decoder_path, "char_lm_data.train")):
         print(
-            "Skip generation of {}. Please remove the file to regenerate it".format(
-                os.path.join(decoder_path, "char_lm_data.train")
-            )
+            f'Skip generation of {os.path.join(decoder_path, "char_lm_data.train")}. Please remove the file to regenerate it'
         )
     else:
         convert_words_to_letters_asg_rep2(

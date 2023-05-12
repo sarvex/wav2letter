@@ -14,6 +14,7 @@ Command : python3 prepare.py --data_dst [...] --model_dst [...] --wp 10000 --nbe
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -46,9 +47,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     os.system(
-        "python3 {}/../../../data/librispeech/prepare.py --dst {} -p {}".format(
-            os.path.dirname(os.path.abspath(__file__)), args.data_dst, args.process
-        )
+        f"python3 {os.path.dirname(os.path.abspath(__file__))}/../../../data/librispeech/prepare.py --dst {args.data_dst} -p {args.process}"
     )
 
     subpaths = {
@@ -66,10 +65,10 @@ if __name__ == "__main__":
     # Generating am/*
     num_wordpieces = args.wp
     train_all_text = os.path.join(am_path, "train.txt")
-    prefix = "librispeech-train-all-unigram-{}".format(num_wordpieces)
+    prefix = f"librispeech-train-all-unigram-{num_wordpieces}"
     prefix = os.path.join(am_path, prefix)
-    vocab_name = prefix + ".vocab"
-    model_name = prefix + ".model"
+    vocab_name = f"{prefix}.vocab"
+    model_name = f"{prefix}.model"
 
     # prepare data
     print("Preparing tokens and lexicon for acoustic model...\n", flush=True)
@@ -77,7 +76,7 @@ if __name__ == "__main__":
     with open(train_all_text, "w") as ftext:
         for key, names in subpaths.items():
             for name in names:
-                with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
+                with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
                     for line in flist:
                         transcription = line.strip().split(" ")[3:]
                         if key == "train":
@@ -110,27 +109,27 @@ if __name__ == "__main__":
     # Generating decoder/*
     lm = "4-gram"
     print("Downloading Librispeech official LM model...\n", flush=True)
-    arpa_file = os.path.join(decoder_path, lm + ".arpa")
+    arpa_file = os.path.join(decoder_path, f"{lm}.arpa")
     if not os.path.exists(arpa_file):
         os.system(
             "wget -c -O - http://www.openslr.org/resources/11/{lm}.arpa.gz | "
             "gunzip -c > {fout}".format(lm=lm, fout=arpa_file)
         )
     else:
-        print("Arpa file {} exist, skip its downloading.".format(arpa_file))
+        print(f"Arpa file {arpa_file} exist, skip its downloading.")
     # temporary arpa file in lowercase
     os.system(
         "cat {arpa} | tr '[:upper:]' '[:lower:]' > {arpa}.lower".format(arpa=arpa_file)
     )
     lm_words = []
-    with open(arpa_file + ".lower", "r") as arpa:
+    with open(f"{arpa_file}.lower", "r") as arpa:
         for line in arpa:
             # verify if the line corresponds to unigram
             if not re.match(r"[-]*[0-9\.]+\t\S+\t*[-]*[0-9\.]*$", line):
                 continue
             word = line.split("\t")[1]
             word = word.strip().lower()
-            if word == "<unk>" or word == "<s>" or word == "</s>":
+            if word in ["<unk>", "<s>", "</s>"]:
                 continue
             assert re.match("^[a-z']+$", word), "invalid word - {w}".format(w=word)
             lm_words.append(word)
@@ -167,7 +166,7 @@ if __name__ == "__main__":
                             + " ".join([w.replace("\u2581", "_") for w in wp])
                             + "\n"
                         )
-        nbest = int(nbest)
+        nbest = nbest
         decoder_lexicon_name = "decoder-unigram-{sz}-nbest{n}.lexicon".format(
             sz=num_wordpieces, n=nbest
         )

@@ -71,16 +71,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     os.system(
-        "python3 {}/../../../data/wsj/prepare.py "
-        "--wsj0 {} --wsj1 {} --sph2pipe {} --wsj1_type {} --dst {} -p {}".format(
-            os.path.dirname(os.path.abspath(__file__)),
-            args.wsj0,
-            args.wsj1,
-            args.sph2pipe,
-            args.wsj1_type,
-            args.data_dst,
-            args.process,
-        )
+        f"python3 {os.path.dirname(os.path.abspath(__file__))}/../../../data/wsj/prepare.py --wsj0 {args.wsj0} --wsj1 {args.wsj1} --sph2pipe {args.sph2pipe} --wsj1_type {args.wsj1_type} --dst {args.data_dst} -p {args.process}"
     )
 
     lists_path = os.path.join(args.data_dst, "lists")
@@ -108,7 +99,7 @@ if __name__ == "__main__":
     lexicon_dict = defaultdict(int)
 
     for name in ["si284", "nov93dev"]:
-        with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
+        with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
             for line in flist:
                 transcription = line.strip().split(" ")[3:]
                 words_set.update(transcription)
@@ -117,9 +108,7 @@ if __name__ == "__main__":
                         lexicon_dict[word] += 1
 
     print(
-        "Writing lexicon file - {}...".format(
-            os.path.join(am_path, "lexicon_si284+nov93dev.txt")
-        ),
+        f'Writing lexicon file - {os.path.join(am_path, "lexicon_si284+nov93dev.txt")}...',
         flush=True,
     )
     with open(os.path.join(am_path, "lexicon_si284+nov93dev.txt"), "w") as f:
@@ -127,7 +116,7 @@ if __name__ == "__main__":
             spelling = get_spelling(word)
             assert re.match(
                 r"[a-z']+", spelling
-            ), "invalid spelling for word '{}'".format(word)
+            ), f"invalid spelling for word '{word}'"
 
             f.write(
                 "{word}\t{tokens} |\n".format(
@@ -141,8 +130,8 @@ if __name__ == "__main__":
     print("Generating lexicon.txt (word -> tokens) for decoding", flush=True)
 
     lex_file = os.path.join(decoder_path, "lexicon.txt")
-    print("Writing lexicon file - {}...".format(lex_file), flush=True)
-    with open(lex_file, "w") as f, open(lm_data_path, "r") as f_lm:
+    print(f"Writing lexicon file - {lex_file}...", flush=True)
+    with (open(lex_file, "w") as f, open(lm_data_path, "r") as f_lm):
         for line in f_lm:
             for word in line.strip().split(" "):
                 lexicon_dict[word] += 1
@@ -153,7 +142,7 @@ if __name__ == "__main__":
             if re.match("^[a-z']+$", spelling):
                 f.write("{w}\t{s} |\n".format(w=words[index], s=" ".join(spelling)))
             else:
-                print('Ignore word "{}" in lexicon'.format(words[index]))
+                print(f'Ignore word "{words[index]}" in lexicon')
 
     # Train 4-gram language model
     train_data = os.path.join(decoder_path, "lm+si284.txt")

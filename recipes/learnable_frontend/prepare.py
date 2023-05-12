@@ -23,6 +23,7 @@ Command : python3 prepare.py \
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -50,31 +51,24 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     os.system(
-        "python3 {}/../../data/timit/prepare.py "
-        "--src {} --sph2pipe {} --dst {} -p {}".format(
-            os.path.dirname(os.path.abspath(__file__)),
-            args.src,
-            args.sph2pipe,
-            args.data_dst,
-            args.process,
-        )
+        f"python3 {os.path.dirname(os.path.abspath(__file__))}/../../data/timit/prepare.py --src {args.src} --sph2pipe {args.sph2pipe} --dst {args.data_dst} -p {args.process}"
     )
 
     am_path = os.path.join(args.model_dst, "am")
     os.makedirs(am_path, exist_ok=True)
-    with open(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "../../data/timit/phones.txt"
-        ),
-        "r",
-    ) as fin, open(os.path.join(am_path, "tokens.txt"), "w") as fout, open(
-        os.path.join(am_path, "lexicon.txt"), "w"
-    ) as fout_lexicon:
+    with (open(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "../../data/timit/phones.txt"
+            ),
+            "r",
+        ) as fin, open(os.path.join(am_path, "tokens.txt"), "w") as fout, open(
+            os.path.join(am_path, "lexicon.txt"), "w"
+        ) as fout_lexicon):
         for line in fin:
             if line.strip() == "":
                 continue
             fout.write(line)
             for token in line.strip().split(" "):
-                fout_lexicon.write("{}\t{}\n".format(token, token))
+                fout_lexicon.write(f"{token}\t{token}\n")
 
     print("Done!", flush=True)

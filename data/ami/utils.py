@@ -27,7 +27,7 @@ def split_audio(line):
     fn = f"{meetid}.Headset-{idx}.wav"
     infile = os.path.join(apath, meetid, fn)
     assert os.path.exists(infile), f"{infile} doesn't exist"
-    new_path = os.path.join(apath, "segments", meetid, key + ".flac")
+    new_path = os.path.join(apath, "segments", meetid, f"{key}.flac")
     sox_tfm = sox.Transformer()
     sox_tfm.set_output_format(
         file_type="flac", encoding="signed-integer", bits=16, rate=16000
@@ -150,6 +150,8 @@ def create_limited_sup(list_dir):
     fid2length = get_fid2length(train_file)
     all_records = full_records(speakers, fid2length)
 
+    # select 15 random speakers
+    min_minutes_per_speaker = 15
     for gender in ["M", "F"]:
         print(f"Selecting from gender {gender}")
         records = [rec for rec in all_records if rec.speaker.gender == gender]
@@ -158,8 +160,6 @@ def create_limited_sup(list_dir):
             records, lambda_key=lambda r: r.speaker.id, lambda_value=lambda r: r.length
         )
 
-        # select 15 random speakers
-        min_minutes_per_speaker = 15
         speakers_10hr = {
             r.speaker.id
             for r in records
@@ -177,7 +177,7 @@ def create_limited_sup(list_dir):
             random.shuffle(cur_records[speaker])
 
         # 1 hr as 6 x 10min splits
-        key = "10min_" + gender
+        key = f"10min_{gender}"
         write_records[key] = {}
         for i in range(6):
             speakers_10min = random.sample(set(speakers_10hr), 3)
@@ -188,7 +188,7 @@ def create_limited_sup(list_dir):
                 chosen_records[kk.fid] = 1
 
         # 9 hr
-        key = "9hr_" + gender
+        key = f"9hr_{gender}"
         write_records[key], _ = do_split(
             cur_records, speakers_10hr, (9 * 60 * 60) / 2, chosen_records
         )

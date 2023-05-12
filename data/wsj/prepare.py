@@ -23,6 +23,7 @@ Command : python3 prepare.py --wsj0 [...]/WSJ0/media \
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -73,15 +74,16 @@ if __name__ == "__main__":
     # Prepare audio data
     transcripts = find_transcripts([args.wsj0, args.wsj1])
 
-    subsets = dict()
-    subsets["si84"] = ndx_to_samples(
-        args.wsj0,
-        "11-13.1/wsj0/doc/indices/train/tr_s_wv1.ndx",
-        transcripts,
-        lambda line: None if "11_2_1:wsj0/si_tr_s/401" in line else line,
-    )
+    subsets = {
+        "si84": ndx_to_samples(
+            args.wsj0,
+            "11-13.1/wsj0/doc/indices/train/tr_s_wv1.ndx",
+            transcripts,
+            lambda line: None if "11_2_1:wsj0/si_tr_s/401" in line else line,
+        )
+    }
     assert len(subsets["si84"]) == 7138, "Incorrect number of samples in si84 part:"
-    " should be 7138, but fould #{}.".format(len(subsets["si84"]))
+    f' should be 7138, but fould #{len(subsets["si84"])}.'
 
     subsets["si284"] = ndx_to_samples(
         args.wsj0,
@@ -92,89 +94,77 @@ if __name__ == "__main__":
 
     subsets["si284"] = subsets["si284"] + ndx_to_samples(
         args.wsj1,
-        "13{}34.1/wsj1/doc/indices/si_tr_s.ndx".format(wsj1_sep),
+        f"13{wsj1_sep}34.1/wsj1/doc/indices/si_tr_s.ndx",
         transcripts,
         None,
         wsj1_sep,
     )
     assert len(subsets["si284"]) == 37416, "Incorrect number of samples in si284 part: "
-    "should be 37416, but fould {}.".format(len(subsets["si284"]))
+    f'should be 37416, but fould {len(subsets["si284"])}.'
 
     subsets["nov92"] = ndx_to_samples(
         args.wsj0,
         "11-13.1/wsj0/doc/indices/test/nvp/si_et_20.ndx",
         transcripts,
-        lambda line: line + ".wv1",
+        lambda line: f"{line}.wv1",
     )
     assert (
         len(subsets["nov92"]) == 333
-    ), "Incorrect number of samples in si284 part: should be 333, but fould {}.".format(
-        len(subsets["nov92"])
-    )
+    ), f'Incorrect number of samples in si284 part: should be 333, but fould {len(subsets["nov92"])}.'
 
     subsets["nov92_5k"] = ndx_to_samples(
         args.wsj0,
         "11-13.1/wsj0/doc/indices/test/nvp/si_et_05.ndx",
         transcripts,
-        lambda line: line + ".wv1",
+        lambda line: f"{line}.wv1",
     )
     assert (
         len(subsets["nov92_5k"]) == 330
-    ), "Incorrect number of samples in si284 part: should be 330, but fould {}.".format(
-        len(subsets["nov92_5k"])
-    )
+    ), f'Incorrect number of samples in si284 part: should be 330, but fould {len(subsets["nov92_5k"])}.'
 
     subsets["nov93"] = ndx_to_samples(
         args.wsj1,
-        "13{}32.1/wsj1/doc/indices/wsj1/eval/h1_p0.ndx".format(wsj1_sep),
+        f"13{wsj1_sep}32.1/wsj1/doc/indices/wsj1/eval/h1_p0.ndx",
         transcripts,
         lambda line: line.replace("13_32_1", "13_33_1"),
         wsj1_sep,
     )
     assert (
         len(subsets["nov93"]) == 213
-    ), "Incorrect number of samples in si284 part: should be 213, but fould {}.".format(
-        len(subsets["nov93"])
-    )
+    ), f'Incorrect number of samples in si284 part: should be 213, but fould {len(subsets["nov93"])}.'
 
     subsets["nov93_5k"] = ndx_to_samples(
         args.wsj1,
-        "13{}32.1/wsj1/doc/indices/wsj1/eval/h2_p0.ndx".format(wsj1_sep),
+        f"13{wsj1_sep}32.1/wsj1/doc/indices/wsj1/eval/h2_p0.ndx",
         transcripts,
         lambda line: line.replace("13_32_1", "13_33_1"),
         wsj1_sep,
     )
     assert (
         len(subsets["nov93_5k"]) == 215
-    ), "Incorrect number of samples in si284 part: should be 215, but fould {}.".format(
-        len(subsets["nov93_5k"])
-    )
+    ), f'Incorrect number of samples in si284 part: should be 215, but fould {len(subsets["nov93_5k"])}.'
 
     subsets["nov93dev"] = ndx_to_samples(
         args.wsj1,
-        "13{}34.1/wsj1/doc/indices/h1_p0.ndx".format(wsj1_sep),
+        f"13{wsj1_sep}34.1/wsj1/doc/indices/h1_p0.ndx",
         transcripts,
         None,
         wsj1_sep,
     )
     assert (
         len(subsets["nov93dev"]) == 503
-    ), "Incorrect number of samples in si284 part: should be 503, but fould {}.".format(
-        len(subsets["nov93dev"])
-    )
+    ), f'Incorrect number of samples in si284 part: should be 503, but fould {len(subsets["nov93dev"])}.'
 
     subsets["nov93dev_5k"] = ndx_to_samples(
         args.wsj1,
-        "13{}34.1/wsj1/doc/indices/h2_p0.ndx".format(wsj1_sep),
+        f"13{wsj1_sep}34.1/wsj1/doc/indices/h2_p0.ndx",
         transcripts,
         None,
         wsj1_sep,
     )
     assert (
         len(subsets["nov93dev_5k"]) == 513
-    ), "Incorrect number of samples in si284 part: should be 513, but fould {}.".format(
-        len(subsets["nov93dev_5k"])
-    )
+    ), f'Incorrect number of samples in si284 part: should be 513, but fould {len(subsets["nov93dev_5k"])}.'
 
     audio_path = os.path.join(args.dst, "audio")
     text_path = os.path.join(args.dst, "text")
@@ -214,44 +204,40 @@ if __name__ == "__main__":
                     total=n_samples,
                 )
             )
-            list_dst = os.path.join(lists_path, set_name + ".lst")
+            list_dst = os.path.join(lists_path, f"{set_name}.lst")
             if not os.path.exists(list_dst):
                 with open(list_dst, "w") as f_list:
                     for sample_info in samples_info:
                         f_list.write(" ".join(sample_info) + "\n")
             else:
                 print(
-                    "List {} already exists, skip its generation."
-                    " Please remove it if you want to regenerate the list".format(
-                        list_dst
-                    ),
+                    f"List {list_dst} already exists, skip its generation. Please remove it if you want to regenerate the list",
                     flush=True,
                 )
 
         for sample_info in samples_info:
             transcription_words.update(sample_info[3].lower().split(" "))
         # Prepare text data
-        text_dst = os.path.join(text_path, set_name + ".txt")
+        text_dst = os.path.join(text_path, f"{set_name}.txt")
         if not os.path.exists(text_dst):
             with open(text_dst, "w") as f_text:
                 for sample_info in samples_info:
                     f_text.write(sample_info[3] + "\n")
         else:
             print(
-                "Transcript text file {} already exists, skip its generation."
-                " Please remove it if you want to regenerate the list".format(text_dst),
+                f"Transcript text file {text_dst} already exists, skip its generation. Please remove it if you want to regenerate the list",
                 flush=True,
             )
 
     # Prepare text data (for language model)
     lm_paths = [
-        "13{}32.1/wsj1/doc/lng_modl/lm_train/np_data/87".format(wsj1_sep),
-        "13{}32.1/wsj1/doc/lng_modl/lm_train/np_data/88".format(wsj1_sep),
-        "13{}32.1/wsj1/doc/lng_modl/lm_train/np_data/89".format(wsj1_sep),
+        f"13{wsj1_sep}32.1/wsj1/doc/lng_modl/lm_train/np_data/87",
+        f"13{wsj1_sep}32.1/wsj1/doc/lng_modl/lm_train/np_data/88",
+        f"13{wsj1_sep}32.1/wsj1/doc/lng_modl/lm_train/np_data/89",
     ]
     if not os.path.exists(os.path.join(text_path, "cmudict.0.7a")):
         url = "http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict.0.7a"
-        cmd = "cd {} && wget {}".format(text_path, url)
+        cmd = f"cd {text_path} && wget {url}"
         os.system(cmd)
     else:
         print("CMU dict already exists, skip its downloading", flush=True)
@@ -271,8 +257,7 @@ if __name__ == "__main__":
 
     if os.path.exists(lm_file):
         print(
-            "LM data already exist, skip its generation."
-            " Please remove the file {} to regenerate it".format(lm_file),
+            f"LM data already exist, skip its generation. Please remove the file {lm_file} to regenerate it",
             flush=True,
         )
     else:
@@ -324,7 +309,7 @@ if __name__ == "__main__":
                                 word = preprocess_word(raw_word)
                                 if len(word) > 0:
                                     sentence.append(word)
-                            if len(sentence) > 0:
+                            if sentence:
                                 f_lm.write(" ".join(sentence) + "\n")
 
     print("Done!", flush=True)

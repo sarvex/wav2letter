@@ -14,6 +14,7 @@ Command : python3 prepare.py --data_dst [...] --model_dst [...] --kenlm [...]/ke
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -43,9 +44,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     os.system(
-        "python3 {}/../../../data/librispeech/prepare.py --dst {} -p {}".format(
-            os.path.dirname(os.path.abspath(__file__)), args.data_dst, args.process
-        )
+        f"python3 {os.path.dirname(os.path.abspath(__file__))}/../../../data/librispeech/prepare.py --dst {args.data_dst} -p {args.process}"
     )
 
     subpaths = {
@@ -75,7 +74,7 @@ if __name__ == "__main__":
     word_dict = defaultdict(set)
     for key, names in subpaths.items():
         for name in names:
-            with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
+            with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
                 for line in flist:
                     transcription = line.strip().split(" ")[3:]
                     word_dict[key].update(transcription)
@@ -90,9 +89,7 @@ if __name__ == "__main__":
     # Prepare data for char lm training/evaluation
     if os.path.exists(os.path.join(decoder_path, "char_lm_data.train")):
         print(
-            "Skip generation of {}. Please remove the file to regenerate it".format(
-                os.path.join(decoder_path, "char_lm_data.train")
-            )
+            f'Skip generation of {os.path.join(decoder_path, "char_lm_data.train")}. Please remove the file to regenerate it'
         )
     else:
         convert_words_to_letters_asg_rep2(
@@ -241,7 +238,7 @@ if __name__ == "__main__":
 
     with open(os.path.join(decoder_path, "lexicon.txt"), "a") as flex:
         for word in additional_set:
-            flex.write("{}\t{}\n".format(word, " ".join(list(word)) + " |"))
+            flex.write(f'{word}\t{" ".join(list(word)) + " |"}\n')
     os.rename(
         os.path.join(decoder_path, "lexicon.txt"),
         os.path.join(decoder_path, "lexicon.lst"),
@@ -250,14 +247,11 @@ if __name__ == "__main__":
     # prepare oov and in vocabulary samples lists
     decoder_lexicon_words = []
     with open(os.path.join(decoder_path, "lexicon.lst"), "r") as flex:
-        for line in flex:
-            decoder_lexicon_words.append(line.strip().split("\t")[0])
+        decoder_lexicon_words.extend(line.strip().split("\t")[0] for line in flex)
     decoder_lexicon_words = set(decoder_lexicon_words)
 
     for list_name in ["test-clean.lst", "test-other.lst"]:
-        with open(os.path.join(lists_path, list_name), "r") as flist, open(
-            os.path.join(decoder_path, list_name + ".oov"), "w"
-        ) as foov, open(os.path.join(decoder_path, list_name + ".inv"), "w") as finv:
+        with (open(os.path.join(lists_path, list_name), "r") as flist, open(os.path.join(decoder_path, f"{list_name}.oov"), "w") as foov, open(os.path.join(decoder_path, f"{list_name}.inv"), "w") as finv):
             for line in flist:
                 sample_words = set(line.strip().split(" ")[3:])
                 if len(sample_words - decoder_lexicon_words) > 0:

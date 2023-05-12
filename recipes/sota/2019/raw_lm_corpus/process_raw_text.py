@@ -14,7 +14,7 @@ def strip_header(name):
 
 def extract_one_book(book_path):
     content = strip_header(book_path)
-    newname = os.path.splitext(book_path)[0] + ".body.txt"
+    newname = f"{os.path.splitext(book_path)[0]}.body.txt"
     with open(newname, "w") as outfile:
         outfile.write(content)
 

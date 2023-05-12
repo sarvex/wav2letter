@@ -1,9 +1,7 @@
 import sys
 
 
-for _, line in enumerate(sys.stdin):
+for line in sys.stdin:
     line = line.strip()
-    if line == "<P>":
-        continue
-    else:
+    if line != "<P>":
         print(line)

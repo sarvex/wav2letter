@@ -41,9 +41,7 @@ def predict_batch(sentences, model, fairseq_dict, max_len):
         encoded_input.append([fairseq_dict.index(token) for token in sentence])
         assert (
             len(encoded_input[-1]) <= max_len
-        ), "Error in the input length, it should be less than max_len {}".format(
-            max_len
-        )
+        ), f"Error in the input length, it should be less than max_len {max_len}"
         if len(encoded_input[-1]) < max_len:
             padded_input.append(
                 [fairseq_dict.eos()]
@@ -115,7 +113,7 @@ if __name__ == "__main__":
     batch = []
     original_lines = []
     max_len = 0
-    with open(args.text, "r") as ftext, open(args.out, "w") as fout:
+    with (open(args.text, "r") as ftext, open(args.out, "w") as fout):
         for line in ftext:
             # id | decoder score | am score | lm score | wer | transcription
             line_parsed = line.rstrip().split("|")
@@ -136,9 +134,9 @@ if __name__ == "__main__":
                 nwords += nwords_batch
                 for index in range(len(batch)):
                     if args.skip:
-                        fout.write(original_lines[index] + " {}\n".format(ppls[index]))
+                        fout.write(f"{original_lines[index]} {ppls[index]}\n")
                     else:
-                        fout.write("{}\n".format(ppls[index]))
+                        fout.write(f"{ppls[index]}\n")
                 batch = [sentence]
                 if args.skip:
                     original_lines = [line_parsed[0].strip().split(" ")[0]]
@@ -156,8 +154,8 @@ if __name__ == "__main__":
             nwords += nwords_batch
             for index in range(len(batch)):
                 if args.skip:
-                    fout.write(original_lines[index] + " {}\n".format(ppls[index]))
+                    fout.write(f"{original_lines[index]} {ppls[index]}\n")
                 else:
-                    fout.write("{}\n".format(ppls[index]))
+                    fout.write(f"{ppls[index]}\n")
 
     print("Total PPL", numpy.exp(-total_loss / nwords))

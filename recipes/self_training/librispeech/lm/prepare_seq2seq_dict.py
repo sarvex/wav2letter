@@ -18,6 +18,7 @@ Command : python3 prepare_seq2seq_dict.py --src [...] --dst [...]
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -35,6 +36,17 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    num_wordpieces = 5000
+    nbest = 10
+    prefix = f"librispeech-train-all-unigram-{num_wordpieces}"
+    prefix = os.path.join(args.dst, prefix)
+    textfile = os.path.join(args.dst, "train-all.text")
+    model = f"{prefix}.model"
+    vocab = f"{prefix}.vocab"
+
+    # prepare data
+    sys.stdout.write("preparing data...\n")
+    sys.stdout.flush()
     filelists = {
         "train": [
             "train-clean-100",
@@ -43,18 +55,6 @@ if __name__ == "__main__":
         ],
         "dev": ["dev-clean", "dev-other"],
     }
-
-    num_wordpieces = 5000
-    nbest = 10
-    prefix = "librispeech-train-all-unigram-{}".format(num_wordpieces)
-    prefix = os.path.join(args.dst, prefix)
-    textfile = os.path.join(args.dst, "train-all.text")
-    model = prefix + ".model"
-    vocab = prefix + ".vocab"
-
-    # prepare data
-    sys.stdout.write("preparing data...\n")
-    sys.stdout.flush()
     train_text = utils.read_list(args.src, filelists["train"])
     dev_text = utils.read_list(args.src, filelists["dev"])
 
@@ -73,11 +73,10 @@ if __name__ == "__main__":
     # train
     sys.stdout.write("computing word pieces...\n")
     sys.stdout.flush()
-    train_cmd = "--input={input} --model_prefix={prefix} --vocab_size={sz} ".format(
-        input=textfile, prefix=prefix, sz=num_wordpieces
-    )
     train_cmd = (
-        train_cmd
+        "--input={input} --model_prefix={prefix} --vocab_size={sz} ".format(
+            input=textfile, prefix=prefix, sz=num_wordpieces
+        )
         + "--character_coverage=1.0 --model_type=unigram --split_by_unicode_script=false"
     )
     spm.SentencePieceTrainer.Train(train_cmd)
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     # word piece dictionary
     sys.stdout.write("creating word piece list...\n")
     exclude_list = {"<unk>", "<s>", "</s>"}
-    with open(vocab + "-filtered", "w") as o:
+    with open(f"{vocab}-filtered", "w") as o:
         with open(vocab, "r") as f:
             for line in f:
                 v, _ = line.strip().split("\t", 1)

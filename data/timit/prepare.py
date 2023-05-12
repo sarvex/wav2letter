@@ -47,7 +47,7 @@ def copy_to_flac(info):
         )
         assert (
             sox.file_info.duration(tmp_file) > 0
-        ), "Audio file {} duration is zero.".format(original_path)
+        ), f"Audio file {original_path} duration is zero."
 
         sox_tfm = sox.Transformer()
         sox_tfm.set_output_format(file_type="flac", encoding="signed-integer", bits=16)
@@ -57,7 +57,7 @@ def copy_to_flac(info):
 
     duration = sox.file_info.duration(path) * 1000  # miliseconds
 
-    transcripts = dict()
+    transcripts = {}
     for target_type in [".PHN", ".WRD"]:
         targets = []
         target_file = original_path.replace(".WAV", target_type)
@@ -65,9 +65,7 @@ def copy_to_flac(info):
         with open(target_file, "r") as f:
             for line in f:
                 start, end, token = line.strip().split()
-                assert start and end and token, "Something wrong with {} file".format(
-                    target_file
-                )
+                assert start and end and token, f"Something wrong with {target_file} file"
                 targets.append(token)
         transcripts[target_type] = " ".join(targets)
 

@@ -5,7 +5,7 @@ from collections import defaultdict
 if __name__ == "__main__":
     words_dict = defaultdict(int)
     path = sys.argv[1]
-    out_path = path + ".freq"
+    out_path = f"{path}.freq"
     with open(path, "r") as f:
         for line in f:
             for word in line.strip().split():
@@ -14,4 +14,4 @@ if __name__ == "__main__":
         for word, count in sorted(
             words_dict.items(), key=lambda kv: kv[1], reverse=True
         ):
-            fout.write("{} {}\n".format(word, count))
+            fout.write(f"{word} {count}\n")

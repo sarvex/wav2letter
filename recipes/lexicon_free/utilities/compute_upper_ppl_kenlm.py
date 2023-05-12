@@ -66,15 +66,12 @@ def compute_upper_limit_ppl_for_kenlm(known_words_file, kenlm_file):
         ppl_word = numpy.exp(-(sum_logp + sum_logp_unk) / (n_words + n_words_unk))
 
         print(
-            "Letter loss: {}, letter perplexity: {}".format(
-                loss_letter, numpy.exp(loss_letter)
-            )
+            f"Letter loss: {loss_letter}, letter perplexity: {numpy.exp(loss_letter)}"
         )
-        print("Upper word perplexity for all words: {}".format(ppl_word))
-        print("Upper word perplexity for unknown words: {}".format(ppl_word_unk))
+        print(f"Upper word perplexity for all words: {ppl_word}")
+        print(f"Upper word perplexity for unknown words: {ppl_word_unk}")
         print(
-            "(Reported in the paper) "
-            "Upper word perplexity for known words: {}".format(ppl_word_no_unk)
+            f"(Reported in the paper) Upper word perplexity for known words: {ppl_word_no_unk}"
         )
 
 
@@ -92,5 +89,5 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    print("Evaluate file {}".format(args.kenlm_preds))
+    print(f"Evaluate file {args.kenlm_preds}")
     compute_upper_limit_ppl_for_kenlm(args.vocab_file, args.kenlm_preds)

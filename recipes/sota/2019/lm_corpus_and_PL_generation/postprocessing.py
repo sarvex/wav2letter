@@ -49,14 +49,8 @@ if __name__ == "__main__":
             # convert roman numbers
             if len(set(word) - ROMANS) == 0 and (
                 word != "I"
-                or (
-                    word == "I"
-                    and index > 0
-                    and (
-                        splitted_text[index - 1] == "Chapter"
-                        or splitted_text[index - 1] == "CHAPTER"
-                    )
-                )
+                or index > 0
+                and splitted_text[index - 1] in ["Chapter", "CHAPTER"]
             ):
                 try:
                     word = str(roman.fromRoman(word))
@@ -103,12 +97,7 @@ if __name__ == "__main__":
             if (
                 len(word) > 2
                 and len(set(word[:-2]) - NUMBERS) == 0
-                and (
-                    word[-2:] == "th"
-                    or word[-2:] == "st"
-                    or word[-2:] == "nd"
-                    or word[-2:] == "rd"
-                )
+                and word[-2:] in ["th", "st", "nd", "rd"]
             ):
                 cleaned_text.append(
                     num2words.num2words(int(word[:-2].replace(",", "")), to="ordinal")
@@ -125,10 +114,9 @@ if __name__ == "__main__":
                 # add word if last token is . (remove this dot): like words dr., ms., etc
                 elif len(set(word[:-1]) - ACCEPTED_LETTERS) == 0 and word[-1] == ".":
                     cleaned_text.append(word[:-1])
-            # merge ' for the case ...s'
             elif word == "'":
                 if (
-                    len(cleaned_text) > 0
+                    cleaned_text
                     and len(cleaned_text[-1]) > 1
                     and cleaned_text[-1][-1] == "s"
                     and cleaned_text[-1][-2] != "'"
@@ -146,10 +134,7 @@ if __name__ == "__main__":
         for word in cleaned_text.split(" "):
             if word[0] != "'":
                 final_text.append(word)
-            else:
-                if len(final_text) > 0:
-                    final_text[-1] += word
-        final_text = " ".join(final_text).strip()
-        if final_text == "":
-            continue
-        print(final_text)
+            elif final_text:
+                final_text[-1] += word
+        if final_text := " ".join(final_text).strip():
+            print(final_text)

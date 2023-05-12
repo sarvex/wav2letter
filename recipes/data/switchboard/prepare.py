@@ -16,6 +16,7 @@ Command : python3 prepare.py [-h] [--src SRC] [--dst DST] [--hub5_sdir HUB5_SDIR
 Replace [...] with appropriate path
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -150,7 +151,7 @@ if __name__ == "__main__":
                 channel = filename[6]
                 if channel == "A":
                     data[id][2] = os.path.join(dirpath, filename)
-                if channel == "B":
+                elif channel == "B":
                     data[id][3] = os.path.join(dirpath, filename)
 
     for dirpath, _, filenames in os.walk(args.src):

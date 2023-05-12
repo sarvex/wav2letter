@@ -25,7 +25,7 @@ if __name__ == "__main__":
         cleaned_text = []
         for word in nfkd_text.split(" "):
             word = word.lower()
-            if len(set(word).intersection(ACCEPTED_LETTERS)) > 0:
+            if set(word).intersection(ACCEPTED_LETTERS):
                 # add word if it contains acceptable tokens
                 if len(set(word) - ACCEPTED_LETTERS) == 0:
                     cleaned_text.append(word)
@@ -36,10 +36,9 @@ if __name__ == "__main__":
                     cleaned_text.append(
                         "".join([letter for letter in word if letter in ACCEPTED_LETTERS])
                     )
-            # merge ' for the case ...s'
             elif word == "'":
                 if (
-                    len(cleaned_text) > 0
+                    cleaned_text
                     and len(cleaned_text[-1]) > 1
                     and cleaned_text[-1][-1] == "s"
                     and cleaned_text[-1][-2] != "'"
@@ -55,11 +54,8 @@ if __name__ == "__main__":
         # merge '... with its word
         final_text = []
         for word in cleaned_text.split(" "):
-            if word[0] != "'":
-                final_text.append(word)
+            if word[0] == "'" and final_text:
+                final_text[-1] += word
             else:
-                if len(final_text) > 0:
-                    final_text[-1] += word
-                else:
-                    final_text.append(word)
+                final_text.append(word)
         print(" ".join(final_text).strip())

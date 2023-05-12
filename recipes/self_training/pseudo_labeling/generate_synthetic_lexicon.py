@@ -15,9 +15,9 @@ def generate_wp_selling(wp_list):
     spellings = []
     this_spelling = []
     for wp in wp_list:
-        if not "_" in wp:
+        if "_" not in wp:
             this_spelling.append(wp)
-        elif "_" in wp:
+        else:
             if len(this_spelling) > 0:
                 spellings.append(this_spelling)
             this_spelling = [wp]
@@ -57,7 +57,7 @@ def generate(infile):
             elif "---" in line:
                 continue
             else:
-                raise Exception("Format invalid; extraneous line: " + line)
+                raise Exception(f"Format invalid; extraneous line: {line}")
 
             transcription = prediction.strip().split(" ")
             wp_spelling = [e.strip() for e in wp_spelling_raw.strip().split(" ") if e]
@@ -123,45 +123,29 @@ def run():
     args = parser.parse_args()
 
     if not os.path.isfile(args.inputhyp):
-        raise Exception("'" + args.inputhyp + "' - input file doesn't exist")
+        raise Exception(f"'{args.inputhyp}' - input file doesn't exist")
     if not os.path.isfile(args.inputlexicon):
-        raise Exception("'" + args.inputlexicon + "' - input file doesn't exist")
+        raise Exception(f"'{args.inputlexicon}' - input file doesn't exist")
 
     lexicon = generate(args.inputhyp)
     sorted_spellings = order_lexicon(lexicon)
     spellings = create_spellings(sorted_spellings)
-    new_lexicon = []
-    for key in sorted(spellings.keys()):
-        new_lexicon.append(spellings[key])
-
+    new_lexicon = [spellings[key] for key in sorted(spellings.keys())]
     old_lexicon_spellings = read_spellings_from_file(args.inputlexicon)
-    old = {}
-    for entry in old_lexicon_spellings:
-        old[entry.word] = entry
-
-    count = 0
-    for entry in new_lexicon:
-        count += 1
+    old = {entry.word: entry for entry in old_lexicon_spellings}
+    for count, entry in enumerate(new_lexicon, start=1):
         if count % 1000 == 0:
-            print("Processed " + str(count) + " entries in new lexicon.")
-        if entry.word in old.keys():
+            print(f"Processed {str(count)} entries in new lexicon.")
+        if entry.word in old:
             # entry in lexicon, check if spelling exists, else append to end
             for spelling in entry.sorted_spellings:
-                if spelling in old[entry.word].sorted_spellings:
-                    continue
-                else:
-                    # only add spelling if we don't already have it
-                    if spelling not in old[entry.word].sorted_spellings:
-                        old[entry.word].sorted_spellings.append(spelling)
+                if spelling not in old[entry.word].sorted_spellings:
+                    old[entry.word].sorted_spellings.append(spelling)
         else:
             # OOV case: create a new lexicon entry with these spellings
             old[entry.word] = entry
 
-    final = []
-    # sort the final spellings
-    for key in sorted(old.keys()):
-        final.append(old[key])
-
+    final = [old[key] for key in sorted(old.keys())]
     write_spellings_to_file(final, args.output)
 
 

@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Set, Tuple
 from lst_utils import FileInfo, save_lst, get_speakers_list
 
 
-PUNCTUATION = (string.punctuation + "¡¿").replace("'", "").replace("-", "")
+PUNCTUATION = f"{string.punctuation}¡¿".replace("'", "").replace("-", "")
 PUNCTUATION += "–…»“«·—’”„"
 
 
@@ -73,12 +73,7 @@ def norm_text(
         for char_ in del_set:
             text = text.replace(char_, "")
 
-    valid = True
-    for char_ in text.replace(" ", ""):
-        if char_ not in char_set:
-            valid = False
-            break
-
+    valid = all(char_ in char_set for char_ in text.replace(" ", ""))
     return text, valid
 
 

@@ -15,14 +15,14 @@ EOS = "</s>"
 
 
 def convert_words_to_letters_asg_rep2(fin_name, fout_name):
-    with open(fin_name, "r") as fin, open(fout_name, "w") as fout:
+    with (open(fin_name, "r") as fin, open(fout_name, "w") as fout):
         for line in fin:
             words = line.strip().split(" ")
             for word in words:
                 word = re.sub("[^a-z'.]+", "", word)
                 if len(word) == 0:
                     continue
-                new_word = transform_asg(word) + "|"
+                new_word = f"{transform_asg(word)}|"
                 fout.write(" ".join(list(new_word)) + " ")
             fout.write("\n")
 
@@ -67,7 +67,7 @@ def prepare_vocabs(path):
     with open(path, "r") as f:
         words = f.readline().strip().split(" ")
         words = [re.sub("[^a-z'.]+", "", word) for word in words]
-        known_words = set(list(map(lambda x: transform_asg(x) + "|", words))) - {""}
+        known_words = set(list(map(lambda x: f"{transform_asg(x)}|", words))) - {""}
         words.append("</s>")
         known_words_original = set(words) - {""}
         known_words_original = numpy.array(list(known_words_original))
@@ -81,7 +81,7 @@ def prepare_vocabs_convlm(path):
         for line in f:
             word = line.strip().split(" ")[0]
             words.append(re.sub("[^a-z'.]+", "", word))
-        known_words = set(list(map(lambda x: transform_asg(x) + "|", words))) - {""}
+        known_words = set(list(map(lambda x: f"{transform_asg(x)}|", words))) - {""}
         words.append("</s>")
         known_words_original = set(words) - {""}
         known_words_original = numpy.array(list(known_words_original))

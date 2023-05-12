@@ -32,10 +32,6 @@ def remove_am_books_from_lm(am_book_ids, lm_books):
         if lm_b_id not in am_book_ids:
             clean_lm_books.append(lmb)
     all_lm_books = set(all_lm_books)
-    for a_id in am_book_ids:
-        if a_id not in all_lm_books:
-            pass
-            # print(a_id)
     return clean_lm_books
 
 
@@ -54,8 +50,6 @@ if __name__ == "__main__":
     lm_books = load_lm_books()
     clean_lm_books = remove_am_books_from_lm(am_book_ids, lm_books)
     print(
-        "Removed {} am books from {} lm books. Left with {} lm books".format(
-            len(am_book_ids), len(lm_books), len(clean_lm_books)
-        )
+        f"Removed {len(am_book_ids)} am books from {len(lm_books)} lm books. Left with {len(clean_lm_books)} lm books"
     )
     # write_lm_books_to_file(lm_books)

@@ -1,5 +1,5 @@
 import sys
 
 
-for _, line in enumerate(sys.stdin):
+for line in sys.stdin:
     print(line.strip() + "\n")

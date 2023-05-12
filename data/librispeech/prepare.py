@@ -15,6 +15,7 @@ Command : python3 prepare.py --dst [...]
 Replace [...] with appropriate path
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -65,7 +66,7 @@ if __name__ == "__main__":
     print("Downloading the Librispeech data.", flush=True)
     for pname in subpath_names:
         if not os.path.exists(os.path.join(audio_path, "LibriSpeech", pname)):
-            print("Downloading and unpacking {}...".format(pname))
+            print(f"Downloading and unpacking {pname}...")
             cmd = """wget -c {http}{name}.tar.gz -P {path};
                      yes n 2>/dev/null | gunzip {path}/{name}.tar.gz;
                      tar -C {path} -xf {path}/{name}.tar"""
@@ -80,25 +81,22 @@ if __name__ == "__main__":
                  gunzip {path}/librispeech-lm-norm.txt.gz"""
         os.system(cmd.format(http=text_http, path=text_path))
     else:
-        print("Text data exists, skip its downloading." + LOG_STR, flush=True)
+        print(f"Text data exists, skip its downloading.{LOG_STR}", flush=True)
 
     # Prepare the audio data
     print("Converting audio data into necessary format.", flush=True)
     word_dict = {}
-    for subpath_type in subpaths.keys():
+    for subpath_type, value in subpaths.items():
         word_dict[subpath_type] = set()
-        for subpath in subpaths[subpath_type]:
+        for subpath in value:
             src = os.path.join(audio_path, "LibriSpeech", subpath)
             assert os.path.exists(src), "Unable to find the directory - '{src}'".format(
                 src=src
             )
 
-            dst_list = os.path.join(lists_path, subpath + ".lst")
+            dst_list = os.path.join(lists_path, f"{subpath}.lst")
             if os.path.exists(dst_list):
-                print(
-                    "Path {} exists, skip its generation.".format(dst_list) + LOG_STR,
-                    flush=True,
-                )
+                print(f"Path {dst_list} exists, skip its generation.{LOG_STR}", flush=True)
                 continue
 
             print("Analyzing {src}...".format(src=src), flush=True)
@@ -118,7 +116,7 @@ if __name__ == "__main__":
                 for sp in samples:
                     for s in sp:
                         word_dict[subpath_type].update(s[-1].split(" "))
-                        s[0] = subpath + "-" + s[0]
+                        s[0] = f"{subpath}-{s[0]}"
                         fout.write(" ".join(s) + "\n")
 
     # Prepare text data
@@ -141,23 +139,15 @@ if __name__ == "__main__":
             for index in indices:
                 f.write(text_data[index] + "\n")
     else:
-        print(
-            "Path {} exists, skip its generation.".format(current_path) + LOG_STR,
-            flush=True,
-        )
+        print(f"Path {current_path} exists, skip its generation.{LOG_STR}", flush=True)
 
     for pname in subpath_names:
-        current_path = os.path.join(text_path, pname + ".txt")
+        current_path = os.path.join(text_path, f"{pname}.txt")
         if not os.path.exists(current_path):
-            with open(os.path.join(lists_path, pname + ".lst"), "r") as flist, open(
-                os.path.join(text_path, pname + ".txt"), "w"
-            ) as fout:
+            with (open(os.path.join(lists_path, f"{pname}.lst"), "r") as flist, open(os.path.join(text_path, f"{pname}.txt"), "w") as fout):
                 for line in flist:
                     fout.write(" ".join(line.strip().split(" ")[3:]) + "\n")
         else:
-            print(
-                "Path {} exists, skip its generation.".format(current_path) + LOG_STR,
-                flush=True,
-            )
+            print(f"Path {current_path} exists, skip its generation.{LOG_STR}", flush=True)
 
     print("Done!", flush=True)

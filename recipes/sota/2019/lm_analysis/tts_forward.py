@@ -50,7 +50,7 @@ def tts(model, text, CONFIG, use_cuda, ap, use_gl, speaker_id=None):
             overlap=550,
         )
 
-    print(" >  Run-time: {}".format(time.time() - t_1))
+    print(f" >  Run-time: {time.time() - t_1}")
     return alignment, mel_postnet_spec, stop_tokens, waveform
 
 

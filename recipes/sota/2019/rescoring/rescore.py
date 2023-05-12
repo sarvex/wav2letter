@@ -136,20 +136,21 @@ if __name__ == "__main__":
             # w1: tr LM weight
             # w2: convlm weight
             # w3: word score
-            for w1 in [i for i in np.arange(0.0, 1.0, 0.1)]:
-                for w2 in [i for i in np.arange(-0.3, 0.3, 0.1)]:
-                    for w3 in [i for i in np.arange(0.0, 1.0, 0.1)]:
-                        weights.append({"tr": w1, "convlm": w2, "len": w3})
+            for w1 in list(np.arange(0.0, 1.0, 0.1)):
+                for w2 in list(np.arange(-0.3, 0.3, 0.1)):
+                    weights.extend(
+                        {"tr": w1, "convlm": w2, "len": w3}
+                        for w3 in list(np.arange(0.0, 1.0, 0.1))
+                    )
         else:
-            for _ in range(1000):
-                weights.append(
-                    {
-                        "tr": np.random.rand() * 2.5,
-                        "convlm": (np.random.rand() - 0.5) * 2,
-                        "len": (np.random.rand() - 0.5) * 6,
-                    }
-                )
-
+            weights.extend(
+                {
+                    "tr": np.random.rand() * 2.5,
+                    "convlm": (np.random.rand() - 0.5) * 2,
+                    "len": (np.random.rand() - 0.5) * 6,
+                }
+                for _ in range(1000)
+            )
         num_tries = len(weights)
         print("Total number of search points", num_tries)
         threads = 50
@@ -172,4 +173,4 @@ if __name__ == "__main__":
     print("| Original WER", best_result["original_wer"])
     print("| Oracle WER", best_result["oracle_wer"])
     for i, k in enumerate(TOP_K):
-        print("| Top-{} rescored WER".format(k), best_result["topk_wer"][i])
+        print(f"| Top-{k} rescored WER", best_result["topk_wer"][i])

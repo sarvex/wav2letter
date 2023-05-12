@@ -30,20 +30,19 @@ def write(lines, fid):
 
 def load():
     with open("lmtext_sentences_no_am.txt.filtered", "r") as fid:
-        lines = [l for l in fid]
+        lines = list(fid)
     return lines
 
 
 if __name__ == "__main__":
     lines = load()
-    fid = open("lmtext_clean_no_am.txt", "w")
-    clean_lines = []
-    step = 1000000
-    for i in range(0, len(lines), step):
-        print("Cleaning lines {} - {}".format(i, i + step))
-        pool = Pool()
-        clean_lines = pool.map(clean, lines[i : i + step])
-        pool.close()
-        pool.join()
-        write(clean_lines, fid)
-    fid.close()
+    with open("lmtext_clean_no_am.txt", "w") as fid:
+        clean_lines = []
+        step = 1000000
+        for i in range(0, len(lines), step):
+            print(f"Cleaning lines {i} - {i + step}")
+            pool = Pool()
+            clean_lines = pool.map(clean, lines[i : i + step])
+            pool.close()
+            pool.join()
+            write(clean_lines, fid)

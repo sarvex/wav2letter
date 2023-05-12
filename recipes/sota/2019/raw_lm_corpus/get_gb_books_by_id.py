@@ -14,7 +14,7 @@ def eprint(*args, **kwargs):
 def get_one_book(book_id, outdir):
     eprint("Getting book with id", book_id)
     text = strip_headers(load_etext(book_id)).strip()
-    newpath = os.path.join(outdir, str(book_id) + ".body.txt")
+    newpath = os.path.join(outdir, f"{str(book_id)}.body.txt")
     with open(newpath, "w") as outfile:
         outfile.write(text)
 

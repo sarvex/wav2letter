@@ -14,6 +14,7 @@ Command : python3 prepare.py --data_dst [...] --model_dst [...]
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -38,9 +39,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     os.system(
-        "python3 {}/../../../data/librispeech/prepare.py --dst {} -p {}".format(
-            os.path.dirname(os.path.abspath(__file__)), args.data_dst, args.process
-        )
+        f"python3 {os.path.dirname(os.path.abspath(__file__))}/../../../data/librispeech/prepare.py --dst {args.data_dst} -p {args.process}"
     )
 
     subpaths = {
@@ -61,24 +60,24 @@ if __name__ == "__main__":
     num_wordpieces = 5000
     nbest = 10
     train_all_text = os.path.join(am_path, "train.txt")
-    prefix = "librispeech-paired-train-unigram-{}".format(num_wordpieces)
+    prefix = f"librispeech-paired-train-unigram-{num_wordpieces}"
     prefix = os.path.join(am_path, prefix)
-    vocab_name = prefix + ".vocab"
-    model_name = prefix + ".model"
+    vocab_name = f"{prefix}.vocab"
+    model_name = f"{prefix}.model"
 
     # prepare paired data from train-clean-100
     print("Preparing tokens and lexicon from paired data...\n", flush=True)
     word_dict = set()
     with open(train_all_text, "w") as ftext:
         for name in subpaths["paired"]:
-            with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
+            with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
                 for line in flist:
                     transcription = line.strip().split(" ")[3:]
                     ftext.write(" ".join(transcription) + "\n")
                     word_dict.update(transcription)
 
     for name in subpaths["dev"]:
-        with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
+        with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
             for line in flist:
                 transcription = line.strip().split(" ")[3:]
                 word_dict.update(transcription)
@@ -86,10 +85,8 @@ if __name__ == "__main__":
 
     # prepare dummy file lists and lexicon for unpaired data
     for name in subpaths["unpaired"]:
-        with open(os.path.join(lists_path, name + ".lst"), "r") as flist:
-            with open(
-                os.path.join(unpaired_lists_path, name + "-dummy.lst"), "w"
-            ) as fout:
+        with open(os.path.join(lists_path, f"{name}.lst"), "r") as flist:
+            with open(os.path.join(unpaired_lists_path, f"{name}-dummy.lst"), "w") as fout:
                 for line in flist:
                     file_tag, audio_path, audio_length, _ = \
                         line.strip().split(" ", 3)

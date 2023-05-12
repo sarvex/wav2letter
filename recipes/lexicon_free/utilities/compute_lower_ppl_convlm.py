@@ -67,7 +67,7 @@ def compute_denominator(model, current_state, words, token_index_dict):
         compute_word_logprob(model, current_state, word, token_index_dict)
         for word in words
     ]
-    assert len(preds) != 0, "Invalid denominator"
+    assert preds, "Invalid denominator"
     max_pred = numpy.max(preds)
     return max_pred + numpy.log(numpy.sum(numpy.exp(preds - max_pred)))
 
@@ -82,7 +82,8 @@ def compute_words_model_pdf_mass(
     probs_sum = numpy.sum(probs)
     top = numpy.where(numpy.cumsum(probs[indices]) > 0.95 * probs_sum)[0][0]
     return [
-        transform_asg(w) + "|" if w != EOS else w for w in known_words[indices[:top]]
+        f"{transform_asg(w)}|" if w != EOS else w
+        for w in known_words[indices[:top]]
     ]
 
 
@@ -224,7 +225,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_type", help='"ls" or "wsj"', default="ls")
 
     args = parser.parse_args()
-    print("Evaluate file {}".format(args.text))
+    print(f"Evaluate file {args.text}")
 
     token_indices_dict, indices_token_dict = build_token_index_correspondence(args.dict)
     word_indices_dict, indices_word_dict = build_token_index_correspondence(

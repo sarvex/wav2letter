@@ -19,10 +19,7 @@ def combine_lexicons(lexicon1, lexicon2):
             else:
                 combined[key] = entry
 
-    combined_list = []
-    for key in sorted(combined.keys()):
-        combined_list.append(combined[key])
-    return combined_list
+    return [combined[key] for key in sorted(combined.keys())]
 
 
 def run():
@@ -41,9 +38,9 @@ def run():
     args = parser.parse_args()
 
     if not os.path.isfile(args.lexicon1):
-        raise Exception("'" + args.lexicon1 + "' - input file doesn't exist")
+        raise Exception(f"'{args.lexicon1}' - input file doesn't exist")
     if not os.path.isfile(args.lexicon2):
-        raise Exception("'" + args.lexicon2 + "' - input file doesn't exist")
+        raise Exception(f"'{args.lexicon2}' - input file doesn't exist")
 
     lex1 = read_spellings_from_file(args.lexicon1)
     lex2 = read_spellings_from_file(args.lexicon2)

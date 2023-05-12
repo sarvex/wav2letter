@@ -53,6 +53,6 @@ def zip_datasets(first, second):
     for sample_key in second.keys():
         sample = second[sample_key]
         if sample.sid in output.keys():
-            raise Exception("Attempted to write duplicate sample ID: " + sample.sid)
+            raise Exception(f"Attempted to write duplicate sample ID: {sample.sid}")
         output[sample.sid] = sample
     return output

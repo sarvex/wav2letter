@@ -43,14 +43,12 @@ def find_files(src):
                 new_style_req_dir = req_dir.replace(
                     "fe_03_p1_sph", "fisher_eng_tr_sp_d"
                 )
-                if curdir == req_dir or curdir == new_style_req_dir:
+                if curdir in [req_dir, new_style_req_dir]:
                     dir_mapping[req_dir] = fulldir
-                    continue
-
     transcript_files = {}
     audio_files = {}
     for dir in required_dirs:
-        assert dir in dir_mapping, "could not find the subdirectory {}".format(dir)
+        assert dir in dir_mapping, f"could not find the subdirectory {dir}"
         fulldir = dir_mapping[dir]
         if "tran" in fulldir:
             fulldir = os.path.join(fulldir, "data")

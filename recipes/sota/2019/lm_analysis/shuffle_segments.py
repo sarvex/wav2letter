@@ -20,7 +20,7 @@ TOLERANCE = 0.04
 
 def process(parameters):
     tid, n_samples = parameters
-    output_list = output_dir + "dev-other.{}.lst".format(tid)
+    output_list = f"{output_dir}dev-other.{tid}.lst"
 
     with open(output_list, "w") as fout:
         for i in range(tid * n_samples, min(len(lines), n_samples * (tid + 1))):
@@ -77,13 +77,11 @@ def process(parameters):
             new_target = " ".join([words[i] for i in order])
             new_audio_path = output_dir + filename.split("/")[-1]
             fout.write(
-                "{}\t{}\t{}\t{}\n".format(
-                    new_audio_path, new_audio_path, chunk_ends[-1] * 1000, new_target
-                )
+                f"{new_audio_path}\t{new_audio_path}\t{chunk_ends[-1] * 1000}\t{new_target}\n"
             )
 
             if len(chunk_starts) == 1:
-                os.system("cp {} {}".format(filename, output_dir))
+                os.system(f"cp {filename} {output_dir}")
                 continue
 
             paths = []
@@ -93,7 +91,7 @@ def process(parameters):
                     file_type="flac", encoding="signed-integer", bits=16, rate=16000
                 )
                 sox_tfm.trim(chunk_starts[i], chunk_ends[i])
-                new_path = "/tmp/{}_{}.flac".format(tid, i)
+                new_path = f"/tmp/{tid}_{i}.flac"
                 sox_tfm.build(filename, new_path)
                 paths.append(new_path)
 
@@ -105,9 +103,7 @@ def process(parameters):
 if __name__ == "__main__":
     n_sample_per_thread = len(lines) // N_THREADS + 1
     print(
-        "Spreading {} threads with {} samples in each".format(
-            N_THREADS, n_sample_per_thread
-        )
+        f"Spreading {N_THREADS} threads with {n_sample_per_thread} samples in each"
     )
 
     pool = Pool(N_THREADS)

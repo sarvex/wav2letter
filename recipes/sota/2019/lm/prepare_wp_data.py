@@ -14,6 +14,7 @@ Command : python3 prepare.py --data_src [...] --model_src [...]
 Replace [...] with appropriate paths
 """
 
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
@@ -37,12 +38,10 @@ if __name__ == "__main__":
         ["librispeech-lm-norm.txt.lower.shuffle", "dev-clean.txt", "dev-other.txt"],
         ["train", "dev-clean", "dev-other"],
     ):
-        with open(os.path.join(args.data_src, "text", name), "r") as fin, open(
-            os.path.join(args.model_src, "decoder/lm_wp_10k." + suffix), "w"
-        ) as fout:
+        with (open(os.path.join(args.data_src, "text", name), "r") as fin, open(os.path.join(args.model_src, f"decoder/lm_wp_10k.{suffix}"), "w") as fout):
             for line in fin:
                 result = ""
                 for word in line.strip().split(" "):
                     wps = sp.NBestEncodeAsPieces(word, 1)[0]
                     result += " ".join([w.replace("\u2581", "_") for w in wps]) + " "
-                fout.write("{}\n".format(result.strip()))
+                fout.write(f"{result.strip()}\n")

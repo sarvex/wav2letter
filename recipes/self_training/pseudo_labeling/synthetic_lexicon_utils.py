@@ -40,7 +40,7 @@ def write_spellings_to_file(spellings, outfile):
     with open(outfile, "w") as o:
         for entry in sorted_spellings:
             for spelling in entry.sorted_spellings:
-                o.write(entry.word.strip() + " " + " ".join(spelling).strip())
+                o.write(f"{entry.word.strip()} " + " ".join(spelling).strip())
                 o.write("\n")
 
 
@@ -49,13 +49,10 @@ def read_spellings_from_file(infile):
     with open(infile, "r") as infile:
         for line in infile:
             s_idx = line.find(" ")
-            word = line[0:s_idx].strip()
+            word = line[:s_idx].strip()
             spelling = line[s_idx + 1 :].strip().split(" ")
             if word not in spellings:
                 spellings[word] = LexiconEntry(word, [])
             spellings[word].add_spelling(spelling)
 
-    out = []
-    for key in sorted(spellings.keys()):
-        out.append(spellings[key])
-    return out
+    return [spellings[key] for key in sorted(spellings.keys())]

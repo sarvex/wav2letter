@@ -7,10 +7,8 @@ def count(MIN_SIL_LENGTH, align_file):
     with open(align_file) as fin:
         lines = fin.readlines()
 
-    res = {}
+    res = {"word_counter": [0] * 100, "chunk_counter": [0] * 100}
 
-    res["word_counter"] = [0] * 100  # number of word in each small chunk
-    res["chunk_counter"] = [0] * 100  # number of small chunk per audio
     stat = defaultdict(list)
     good_samples = []
 
@@ -80,7 +78,7 @@ if __name__ == "__main__":
     original_file = sys.argv[2]
     res, data, samples = count(0.13, align_file)
     print(res)
-    fnames = set([line.strip().split("\t")[0].split("/")[-1] for line in samples])
+    fnames = {line.strip().split("\t")[0].split("/")[-1] for line in samples}
     # prepare original filtered file
     with open(original_file, "r") as f, open(
         "original.filtered_chunk_g1_ngrams_le6.lst", "w"
@@ -88,6 +86,6 @@ if __name__ == "__main__":
         for line in f:
             if line.split(" ")[1].split("/")[-1] in fnames:
                 fout.write(line)
-    with open(align_file + ".filtered_chunk_g1_ngrams_le6", "w") as f:
+    with open(f"{align_file}.filtered_chunk_g1_ngrams_le6", "w") as f:
         for sample in samples:
             f.write(sample)

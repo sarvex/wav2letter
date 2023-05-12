@@ -27,7 +27,7 @@ numbers = set("0123456789")
 time_set1 = set(":0123456789")
 time_set2 = set("/0123456789")
 
-for _, line in enumerate(sys.stdin):
+for line in sys.stdin:
     line = line.strip()
     line = re.sub(" +", " ", line).strip()
     new_line = []
@@ -39,11 +39,9 @@ for _, line in enumerate(sys.stdin):
         ):
             new_line.append(time_degree[word.lower()])
         elif len(set(word) - time_set1) == 0:
-            for part in word.split(":"):
-                new_line.append(part)
+            new_line.extend(iter(word.split(":")))
         elif len(set(word) - time_set2) == 0:
-            for part in word.split("/"):
-                new_line.append(part)
+            new_line.extend(iter(word.split("/")))
         elif word.lower() in abbr_mapping:
             new_line.append(abbr_mapping[word.lower()])
         elif "&c" in word:
